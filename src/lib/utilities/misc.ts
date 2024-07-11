@@ -109,13 +109,16 @@ const setUpSFrame = async () => {
 
 /* --- app initializer functions ---*/
 const getWorkingURL = async () => {
-    let URL = localStorage.getItem("url") || "http://localhost:8080";
+    let URL: string | null = "";
+    if (window.location.pathname.includes("localhost"))
+        URL = "http://localhost:8080";
+    else URL = localStorage.getItem("url");
     // console.log(URL);
 
     if (!URL) {
         // no URL was saved
-        localStorage.setItem("url", "https://waterdrop-server.glitch.me");
-        URL = "https://waterdrop-server.glitch.me";
+        localStorage.setItem("url", "https://nopeep-server.glitch.me");
+        URL = "https://nopeep-server.glitch.me";
         workingURL.set(URL);
     }
     modalMessage.set("Connecting to server");
