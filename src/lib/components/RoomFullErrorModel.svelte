@@ -11,11 +11,11 @@
 </script>
 
 <div
-    class="modal fixed top-0 z-50 box-border hidden h-screen w-screen bg-white"
+    class="modal fixed top-0 z-[51] box-border hidden h-screen w-screen bg-white"
     class:visible
 />
 <div
-    class="wrapper fixed top-0 z-50 box-border hidden h-screen w-screen items-center justify-center"
+    class="wrapper fixed top-0 z-[51] box-border hidden h-screen w-screen items-center justify-center"
     class:visible
 >
     <div class="m-4 block w-72 overflow-hidden rounded-xl bg-white p-6 lg:w-96">

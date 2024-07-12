@@ -15,7 +15,7 @@ export const noOfToasts = writable<number>(0);
 export const modalMessage = writable<string>("Loading");
 export const modalVisible = writable<boolean>(true);
 
-export const rejoinScreenVisible = writable<boolean>(false);
+export const rejoinScreenVisible = writable<boolean>(true);
 
 export const setupVisible = writable<boolean>(false);
 
@@ -46,3 +46,5 @@ export const peerConnection = writable<RTCPeerConnection | null>();
 
 export const senderSFrameClient = writable<any | null>();
 export const receiverSFrameClient = writable<any | null>();
+
+export const decryptionSuccess = writable<boolean>(false);

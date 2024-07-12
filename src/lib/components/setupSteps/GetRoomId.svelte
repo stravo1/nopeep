@@ -1,16 +1,20 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { roomId } from "../../store/store";
 
     export let goNext: () => void;
     export let goBack: () => void;
 
-    let value: string = localStorage.getItem("roomId") || "";
+    let value: string;
+    onMount(() => {
+        value = localStorage.getItem("roomId") || "";
+    });
 </script>
 
 <div
-    class="steps step-3 flex h-full w-full shrink-0 flex-col items-center justify-center gap-1 p-8"
+    class="steps step-3 mb-8 flex h-full w-full shrink-0 flex-col items-center justify-center gap-1 p-8"
 >
-    <div class="max-h-[480px] flex flex-col gap-1">
+    <div class="flex max-h-[480px] flex-col gap-1">
         <button
             on:click={goBack}
             class="mt-4 flex w-fit items-center justify-center rounded-lg rounded-r-none py-4 text-lg text-black"

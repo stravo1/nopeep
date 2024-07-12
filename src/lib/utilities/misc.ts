@@ -1,5 +1,6 @@
 import { toast } from "@zerodevx/svelte-toast";
 import {
+    decryptionSuccess,
     deviceInfo,
     key,
     localVideoStream,
@@ -74,6 +75,7 @@ async function getRoomKey(roomId: string, secret: string) {
 
 const setUpSFrame = async () => {
     console.log("Setting up SFrame");
+    let authCount = 0;
     const sharedKey = await getRoomKey(get(roomId), get(key));
     try {
         const senderClient = await SFrame.createClient(SENDERID, {
@@ -86,16 +88,22 @@ const setUpSFrame = async () => {
         await senderClient.setSenderEncryptionKey(sharedKey);
         await receiverClient.addReceiver(SENDERID);
         await receiverClient.setReceiverEncryptionKey(SENDERID, sharedKey);
-        receiverClient.addEventListener("authenticated", (event: any) =>
+        receiverClient.addEventListener("authenticated", (event: any) => {
             console.log(
                 "Authenticated receiver " +
                     event.id +
                     " for sender " +
                     event.senderId,
-            ),
-        );
+            );
+            authCount++;
+            if (authCount === 2) decryptionSuccess.set(true);
+        });
         receiverClient.addEventListener("decryptFailed", () => {
             console.log("decrypt failed");
+            showToast("Decryption failed", "error");
+            get(otherDevicePeer)?.send(
+                JSON.stringify({ command: "failed", action: "decryptFailed}" }),
+            );
         });
         receiverClient.addEventListener("decryptionRestored", () => {
             console.log("decrypt restored");
@@ -109,10 +117,17 @@ const setUpSFrame = async () => {
 
 /* --- app initializer functions ---*/
 const getWorkingURL = async () => {
+    modalMessage.set("Connecting to server");
+    modalVisible.set(true);
     let URL: string | null = "";
-    if (window.location.pathname.includes("localhost"))
-        URL = "http://localhost:8080";
-    else URL = localStorage.getItem("url");
+    if (
+        window.location.pathname.includes("localhost") ||
+        window.location.port === "5173"
+    )
+        URL = localStorage.getItem("url")
+            ? localStorage.getItem("url")
+            : "http://localhost:8080";
+
     // console.log(URL);
 
     if (!URL) {
@@ -121,7 +136,6 @@ const getWorkingURL = async () => {
         URL = "https://nopeep-server.glitch.me";
         workingURL.set(URL);
     }
-    modalMessage.set("Connecting to server");
 
     try {
         // test if local server is functional
@@ -139,6 +153,7 @@ const getWorkingURL = async () => {
             workingURL.set("https://waterdrop-sqxs.onrender.com");
         }
     }
+    modalVisible.set(false);
 };
 
 const checkForAllInfo = () => {
@@ -171,11 +186,13 @@ const showToast = (message: string, type: string = "misc") => {
 };
 
 const endCall = (sender: boolean = false) => {
+    // showToast("Call ended", "misc");
     let outResolver: (val?: any) => void;
     let promise = new Promise((res, rej) => {
         outResolver = res;
     });
     get(mySocket)?.disconnect();
+    decryptionSuccess.set(false);
     if (sender)
         get(otherDevicePeer)?.send(
             JSON.stringify({ command: "bye", action: "" }),
@@ -199,7 +216,7 @@ const endCall = (sender: boolean = false) => {
     return promise;
 };
 
-const reset = async () => {
+const recheck = async () => {
     let allInfoAvailable = checkForAllInfo();
     modalVisible.set(false);
     if (!allInfoAvailable) {
@@ -231,6 +248,6 @@ export {
     setUpSFrame,
     getKeyPair,
     endCall,
-    reset,
+    recheck,
     secondsToHrsMinsSecs,
 };

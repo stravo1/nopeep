@@ -1,13 +1,17 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { key } from "../../store/store";
 
     export let goNext: () => void;
     export let goBack: () => void;
-    let value: string = localStorage.getItem("encKey") || "";
+    let value: string;
+    onMount(() => {
+        value = localStorage.getItem("enckey") || "";
+    });
 </script>
 
 <div
-    class="steps step-4 flex h-full w-full shrink-0 flex-col items-center justify-center gap-1 p-8"
+    class="steps step-4 mb-8 flex h-full w-full shrink-0 flex-col items-center justify-center gap-1 p-8"
 >
     <div class="flex max-h-[480px] flex-col gap-1">
         <button

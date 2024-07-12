@@ -51,7 +51,7 @@ const initializeSocket = (forced: "forced" | null = null) => {
     modalVisible.set(true);
 
     let deviceName = get(deviceInfo).name;
-    
+
     let URL = get(workingURL);
     console.log(URL);
 
@@ -67,7 +67,7 @@ const initializeSocket = (forced: "forced" | null = null) => {
             if (deviceID != socket.id) {
                 otherDeviceId.set(deviceID);
                 createOfferingPeer(deviceID, socket);
-                modalVisible.set(false);
+                modalMessage.set("Connecting securely");
             }
         });
     });
@@ -76,7 +76,7 @@ const initializeSocket = (forced: "forced" | null = null) => {
         if (deviceID != socket.id) {
             otherDeviceId.set(deviceID);
             createAnsweringPeer(deviceID, socket);
-            modalVisible.set(false);
+            modalMessage.set("Connecting securely");
         }
     });
 

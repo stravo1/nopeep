@@ -1,8 +1,7 @@
 <script lang="ts">
     import { get } from "svelte/store";
     import { localVideoStream, rejoinScreenVisible } from "../store/store";
-    import { endCall, reset } from "../utilities/misc";
-    import initializeSocket from "../utilities/initializeSocket";
+    import { endCall, showToast } from "../utilities/misc";
 
     let micOff: boolean = false;
     let videoOff: boolean = false;
@@ -55,8 +54,9 @@
     <button
         class={`flex h-14 w-14 items-center justify-center rounded-lg bg-red-600`}
         on:click={async () => {
+            showToast("Hanging up", "info");
             await endCall(true);
-            await reset();
+            showToast("Call ended", "success");
             rejoinScreenVisible.set(true);
         }}
     >

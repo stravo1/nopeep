@@ -9,12 +9,15 @@ import {
     remoteVideoStream,
     senderSFrameClient,
 } from "../store/store";
-import { endCall, getKeyPair, reset, showToast } from "./misc";
+import { endCall, getKeyPair, recheck, showToast } from "./misc";
 import { toast } from "@zerodevx/svelte-toast";
 import Peer from "peer-lite";
+import initializeSocket from "./initializeSocket";
 
 const SENDERID = 0;
 const RECEIVERID = 1;
+
+let noOfRetries = 0;
 
 const commandInterpreter = async (data: string, deviceID: string) => {
     var { command, action } = JSON.parse(data);
@@ -74,22 +77,59 @@ const commandInterpreter = async (data: string, deviceID: string) => {
             //Encrypt it
             let stream = await Peer.getUserMedia({ video: true, audio: true });
             get(otherDevicePeer)!.addStream(stream);
-            for (const transceiver of $peerConnection!.getTransceivers()) {
-                get(senderSFrameClient).encrypt(
-                    transceiver.mid,
-                    transceiver.sender,
+            try {
+                for (const transceiver of $peerConnection!.getTransceivers()) {
+                    get(senderSFrameClient).encrypt(
+                        transceiver.mid,
+                        transceiver.sender,
+                    );
+                    get(receiverSFrameClient).decrypt(
+                        transceiver.mid,
+                        transceiver.receiver,
+                    );
+                }
+            } catch (e) {
+                console.log(e);
+                showToast("Error occured... trying again!", "error");
+                get(otherDevicePeer)?.send(
+                    JSON.stringify({ command: "retry", action: "" }),
                 );
-                get(receiverSFrameClient).decrypt(
-                    transceiver.mid,
-                    transceiver.receiver,
-                );
+                await endCall();
+                await recheck();
+                initializeSocket();
             }
+            break;
+        case "failed":
+            if (noOfRetries > 3) {
+                window.location.reload();
+                return;
+            } else {
+                noOfRetries++;
+            }
+            showToast("Decryption failed... trying again!", "error");
+            get(otherDevicePeer)?.send(
+                JSON.stringify({ command: "retry", action: "" }),
+            );
+            await endCall();
+            await recheck();
+            initializeSocket();
+            break;
+        case "retry":
+            if (noOfRetries > 3) {
+                window.location.reload();
+                return;
+            } else {
+                noOfRetries++;
+            }
+            // showToast("Decryption failed... trying again!", "error");
+            await endCall();
+            await recheck();
+            initializeSocket();
             break;
 
         case "bye":
             showToast("Call Ended! Redirecting soon...", "error");
             await endCall();
-            await reset();
             rejoinScreenVisible.set(true);
 
         default:

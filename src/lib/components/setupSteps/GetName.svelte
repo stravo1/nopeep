@@ -1,14 +1,18 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { deviceInfo } from "../../store/store";
 
     export let goNext: () => void;
     export let goBack: () => void;
 
-    let value: string = localStorage.getItem("name") || "";
+    let value: string;
+    onMount(() => {
+        value = localStorage.getItem("name") || "";
+    });
 </script>
 
 <div
-    class="steps step-2 flex h-full w-full shrink-0 flex-col items-center justify-center gap-1 p-8"
+    class="steps step-2 mb-8 flex h-full w-full shrink-0 flex-col items-center justify-center gap-1 p-8"
 >
     <div class="flex max-w-[480px] flex-col gap-1">
         <button

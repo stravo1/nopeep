@@ -12,7 +12,7 @@ import {
     rejoinScreenVisible,
 } from "../store/store";
 import commandInterpreter from "./commandInterpreter";
-import { endCall, reset, setUpSFrame, showToast } from "./misc";
+import { endCall, setUpSFrame, showToast } from "./misc";
 
 const SEND_SIGNALLING_OFFER = "transfer-offer";
 const SEND_SIGNALLING_ANSWER = "transfer-answer";
@@ -102,11 +102,10 @@ const createOfferingPeer = async (deviceID: string, socket: Socket) => {
         }
     });
 
-    // peer.on("channelClosed", ({ channel }) => {
-    //     if (channel.label == SENDING_CHANNEL) {
-    //         removeDeviceFromConnectedList(deviceID);
-    //     }
-    // });
+    peer.on("channelClosed", async ({ channel }) => {
+        await endCall();
+        rejoinScreenVisible.set(true);
+    });
 
     peer.on("channelData", ({ channel, source, data }) => {
         handleData(peer, deviceID, source, data);
@@ -120,10 +119,10 @@ const createOfferingPeer = async (deviceID: string, socket: Socket) => {
         remoteVideoStream.set(stream);
     });
 
-    peer.on("disconnected", async () => {
-        await endCall();
-        reset();
-    });
+    // peer.on("disconnected", async () => {
+    //     await endCall();
+    //     reset();
+    // });
 
     await setUpSFrame();
 
@@ -158,11 +157,10 @@ const createAnsweringPeer = async (deviceID: string, socket: Socket) => {
         }
     });
 
-    // peer.on("channelClosed", ({ channel }) => {
-    //     if (channel.label == SENDING_CHANNEL) {
-    //         removeDeviceFromConnectedList(deviceID);
-    //     }
-    // });
+    peer.on("channelClosed", async ({ channel }) => {
+        await endCall();
+        rejoinScreenVisible.set(true);
+    });
 
     peer.on("channelData", ({ channel, source, data }) => {
         handleData(peer, deviceID, source, data);
@@ -176,11 +174,11 @@ const createAnsweringPeer = async (deviceID: string, socket: Socket) => {
         remoteVideoStream.set(stream);
     });
 
-    peer.on("disconnected", async () => {
-        await endCall();
-        await reset();
-        rejoinScreenVisible.set(true);
-    });
+    // peer.on("disconnected", async () => {
+    //     await endCall();
+    //     await reset();
+    //     rejoinScreenVisible.set(true);
+    // });
 
     await setUpSFrame();
 

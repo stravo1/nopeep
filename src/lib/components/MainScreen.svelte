@@ -1,11 +1,13 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import {
+        decryptionSuccess,
         localVideoStream,
+        modalVisible,
         peerConnection,
         remoteVideoStream,
     } from "../store/store";
-    import { secondsToHrsMinsSecs } from "../utilities/misc";
+    import { secondsToHrsMinsSecs, showToast } from "../utilities/misc";
     import Controls from "./Controls.svelte";
     import { get } from "svelte/store";
 
@@ -26,6 +28,23 @@
         ) as HTMLVideoElement;
         if (remoteVideoPlayer && stream) {
             remoteVideoPlayer.srcObject = stream;
+        }
+    });
+
+    decryptionSuccess.subscribe((success) => {
+        let remoteVideoPlayer = document.getElementById(
+            "remoteVideoPlayer",
+        ) as HTMLVideoElement;
+        let localVideoPlayer = document.getElementById(
+            "localVideoPlayer",
+        ) as HTMLVideoElement;
+        if (success) {
+            if (remoteVideoPlayer.paused) {
+                showToast("Connected successfuly!", "success");
+                remoteVideoPlayer.play();
+                localVideoPlayer.play();
+                modalVisible.set(false);
+            }
         }
     });
 
@@ -51,14 +70,13 @@
         <video
             class="h-full w-full rounded-lg object-cover"
             id="remoteVideoPlayer"
-            autoplay
         >
             <track kind="captions" />
         </video>
         <video
+            muted
             class="absolute bottom-0 right-0 h-40 w-40 shrink-0 shadow-lg"
             id="localVideoPlayer"
-            autoplay
         >
             <track kind="captions" />
         </video>
