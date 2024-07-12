@@ -27,15 +27,7 @@ const RECEIVE_ICE_CANDIDATES = "receive-ice";
 const ROOM_FULL_ERROR = "room-full";
 
 const addSignallingData = async (data: RTCSessionDescriptionInit) => {
-    const unsub = otherDevicePeer.subscribe((peer) => {
-        if (peer) {
-            peer.signal(data);
-            setTimeout(() => {
-                unsubscribe();
-            });
-        }
-    });
-    const unsubscribe = unsub;
+    await get(otherDevicePeer)?.signal(data);
 };
 
 const addICEcandidates = async (candidates: RTCIceCandidate[]) => {

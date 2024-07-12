@@ -107,6 +107,7 @@ const createOfferingPeer = async (deviceID: string, socket: Socket) => {
             iceServers,
         },
     });
+    otherDevicePeer.set(peer);
 
     peer.on("signal", (data) => {
         if (data.type !== "offer") return;
@@ -158,15 +159,16 @@ const createOfferingPeer = async (deviceID: string, socket: Socket) => {
 
     peerConnection.set(peer.init());
     peer.start();
-    otherDevicePeer.set(peer);
 };
 
 const createAnsweringPeer = async (deviceID: string, socket: Socket) => {
-    const peer = new Peer({ enableDataChannels: true,
+    const peer = new Peer({
+        enableDataChannels: true,
         config: {
             iceServers,
-        }
+        },
     });
+    otherDevicePeer.set(peer);
 
     peer.on("signal", (data) => {
         if (data.type !== "answer") return;
@@ -217,8 +219,7 @@ const createAnsweringPeer = async (deviceID: string, socket: Socket) => {
     await setUpSFrame();
 
     peerConnection.set(peer.init());
-    peer.start();
-    otherDevicePeer.set(peer);
+    // peer.start();
 };
 
 export { createOfferingPeer, createAnsweringPeer };
