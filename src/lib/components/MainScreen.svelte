@@ -4,6 +4,7 @@
         decryptionSuccess,
         localVideoStream,
         modalVisible,
+        otherDevicePeer,
         peerConnection,
         remoteVideoStream,
     } from "../store/store";
@@ -19,6 +20,16 @@
         ) as HTMLVideoElement;
         if (localVideoPlayer) {
             localVideoPlayer.srcObject = stream;
+            setTimeout(() => {
+                if (!get(decryptionSuccess)) {
+                    get(otherDevicePeer)?.send(
+                        JSON.stringify({
+                            command: "failed",
+                            action: "could not set encoded stream",
+                        }),
+                    );
+                }
+            }, 5000);
         }
     });
 
