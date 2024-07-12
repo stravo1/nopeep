@@ -10,6 +10,8 @@ import {
     remoteVideoStream,
     peerConnection,
     rejoinScreenVisible,
+    senderSFrameClient,
+    receiverSFrameClient,
 } from "../store/store";
 import commandInterpreter from "./commandInterpreter";
 import { endCall, setUpSFrame, showToast } from "./misc";
@@ -18,6 +20,31 @@ const SEND_SIGNALLING_OFFER = "transfer-offer";
 const SEND_SIGNALLING_ANSWER = "transfer-answer";
 const SEND_ICE_CANDIDATES = "transfer-ice";
 const SENDING_CHANNEL = "send";
+const iceServers = [
+    {
+        urls: "stun:stun.relay.metered.ca:80",
+    },
+    {
+        urls: "turn:global.relay.metered.ca:80",
+        username: "47e829c26e817f10c2137367",
+        credential: "rlQd1xFWj7o30Jhm",
+    },
+    {
+        urls: "turn:global.relay.metered.ca:80?transport=tcp",
+        username: "47e829c26e817f10c2137367",
+        credential: "rlQd1xFWj7o30Jhm",
+    },
+    {
+        urls: "turn:global.relay.metered.ca:443",
+        username: "47e829c26e817f10c2137367",
+        credential: "rlQd1xFWj7o30Jhm",
+    },
+    {
+        urls: "turns:global.relay.metered.ca:443?transport=tcp",
+        username: "47e829c26e817f10c2137367",
+        credential: "rlQd1xFWj7o30Jhm",
+    },
+];
 
 const sendOffer = (
     socket: Socket,
@@ -77,11 +104,7 @@ const createOfferingPeer = async (deviceID: string, socket: Socket) => {
         enableDataChannels: true,
         channelLabel: SENDING_CHANNEL,
         config: {
-            iceServers: [
-                {
-                    urls: "stun:stun.l.google.com:19302",
-                },
-            ],
+            iceServers,
         },
     });
 
@@ -141,13 +164,9 @@ const createOfferingPeer = async (deviceID: string, socket: Socket) => {
 const createAnsweringPeer = async (deviceID: string, socket: Socket) => {
     const peer = new Peer({ enableDataChannels: true,
         config: {
-            iceServers:[
-                {
-                    urls: "stun:stun.l.google.com:19302",
-                },
-            ],
+            iceServers,
         }
-     });
+    });
 
     peer.on("signal", (data) => {
         if (data.type !== "answer") return;

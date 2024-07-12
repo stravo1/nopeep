@@ -41,7 +41,7 @@ const addSignallingData = async (data: RTCSessionDescriptionInit) => {
 const addICEcandidates = async (candidates: RTCIceCandidate[]) => {
     var peer = get(otherDevicePeer);
     const promises = candidates.map(async (candidate) =>
-        peer!.addIceCandidate(candidate),
+        peer?.addIceCandidate(candidate),
     );
     await Promise.all(promises);
 };
