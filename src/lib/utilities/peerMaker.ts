@@ -76,6 +76,13 @@ const createOfferingPeer = async (deviceID: string, socket: Socket) => {
     const peer = new Peer({
         enableDataChannels: true,
         channelLabel: SENDING_CHANNEL,
+        config: {
+            iceServers: [
+                {
+                    urls: "stun:stun.l.google.com:19302",
+                },
+            ],
+        },
     });
 
     peer.on("signal", (data) => {
@@ -132,7 +139,15 @@ const createOfferingPeer = async (deviceID: string, socket: Socket) => {
 };
 
 const createAnsweringPeer = async (deviceID: string, socket: Socket) => {
-    const peer = new Peer({ enableDataChannels: true });
+    const peer = new Peer({ enableDataChannels: true,
+        config: {
+            iceServers:[
+                {
+                    urls: "stun:stun.l.google.com:19302",
+                },
+            ],
+        }
+     });
 
     peer.on("signal", (data) => {
         if (data.type !== "answer") return;
