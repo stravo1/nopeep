@@ -26,7 +26,6 @@
   },
   "packageManager": "pnpm@9.1.3+sha256.7f63001edc077f1cff96cacba901f350796287a2800dfa83fe898f94183e4f5f",
   "dependencies": {
-    "git": "link:github.com:maikthomas/sframe.git",
     "peer-lite": "^2.0.2",
     "prettier-plugin-svelte": "^3.2.5",
     "sframe": "github:maikthomas/sframe",
